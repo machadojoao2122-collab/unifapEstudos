@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNIFAP 2026 · Assistente em Administração</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2330;
+    --accent: #4f8ef7;
+    --accent2: #7c5cfc;
+    --accent3: #f75c7e;
+    --green: #38e8a0;
+    --yellow: #f9c846;
+    --text: #e8ecf4;
+    --muted: #6b7492;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ─── SIDEBAR ─────────────────────────────── */
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+    transition: transform .3s ease;
+  }
+
+  .sidebar-brand {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-brand .uni {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .sidebar-brand h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .sidebar-brand .badge {
+    display: inline-block;
+    margin-top: 8px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .sidebar-section {
+    padding: 8px 12px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    margin: 2px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .18s;
+    font-size: 13.5px;
+    color: var(--muted);
+    text-decoration: none;
+    border: none;
+    background: none;
+    width: calc(100% - 16px);
+    text-align: left;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: rgba(79,142,247,.12); color: var(--accent); }
+  .nav-item .icon { font-size: 16px; min-width: 20px; text-align: center; }
+  .nav-item .count {
+    margin-left: auto;
+    font-size: 10px;
+    background: var(--surface2);
+    padding: 2px 7px;
+    border-radius: 20px;
+    color: var(--muted);
+  }
+  .nav-item.active .count { background: rgba(79,142,247,.2); color: var(--accent); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .progress-bar {
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    width: 0%;
+    transition: width .4s ease;
+  }
+
+  /* ─── MAIN ─────────────────────────────────── */
+  .main {
+    margin-left: 280px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    background: rgba(10,12,16,.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .topbar-actions { display: flex; gap: 10px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all .18s;
+    text-decoration: none;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+
+  /* ─── CONTENT ──────────────────────────────── */
+  .content { padding: 32px; max-width: 900px; }
+
+  /* ─── PAGES ────────────────────────────────── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ─── OVERVIEW PAGE ────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, #0f1520 0%, #111a2e 50%, #0d1220 100%);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(79,142,247,.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .hero h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .hero p { color: var(--muted); max-width: 500px; font-size: 14px; }
+
+  .hero-stats {
+    display: flex;
+    gap: 20px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  .stat-pill strong {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .stat-pill span { color: var(--muted); font-size: 12px; }
+
+  /* cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    border-color: rgba(79,142,247,.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,.3);
+  }
+
+  .card-accent-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .card-icon { font-size: 24px; margin-bottom: 12px; }
+  .card h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .card p { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: .05em;
+  }
+
+  .tag-blue { background: rgba(79,142,247,.15); color: var(--accent); }
+  .tag-purple { background: rgba(124,92,252,.15); color: var(--accent2); }
+  .tag-red { background: rgba(247,92,126,.15); color: var(--accent3); }
+  .tag-green { background: rgba(56,232,160,.15); color: var(--green); }
+  .tag-yellow { background: rgba(249,200,70,.15); color: var(--yellow); }
+
+  /* ─── SUBJECT PAGES ────────────────────────── */
+  .subject-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .subject-icon-big {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .subject-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .subject-header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  /* accordion */
+  .accordion { display: flex; flex-direction: column; gap: 8px; }
+
+  .accordion-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .accordion-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--text);
+    text-align: left;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    transition: background .15s;
+    gap: 12px;
+  }
+
+  .accordion-trigger:hover { background: rgba(255,255,255,.03); }
+
+  .accordion-trigger .at-left { display: flex; align-items: center; gap: 12px; }
+
+  .accordion-num {
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    background: rgba(79,142,247,.12);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .accordion-arrow {
+    color: var(--muted);
+    font-size: 12px;
+    transition: transform .2s;
+    flex-shrink: 0;
+  }
+
+  .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+
+  .accordion-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .accordion-item.open .accordion-body { display: block; }
+
+  .topic-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 14px;
+  }
+
+  .topic-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+    border: 1px solid transparent;
+  }
+
+  .topic-list li:hover {
+    background: rgba(255,255,255,.03);
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  .topic-list li.done {
+    color: var(--green);
+    text-decoration: line-through;
+    opacity: .6;
+  }
+
+  .topic-list li.done:hover { opacity: 1; }
+
+  .topic-check {
+    width: 18px; height: 18px;
+    border-radius: 5px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: all .15s;
+  }
+
+  .topic-list li.done .topic-check {
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+  }
+
+  /* ─── INFO BOXES ───────────────────────────── */
+  .info-box {
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 14px 0;
+    font-size: 13px;
+    line-height: 1.6;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .info-box-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .info-blue { background: rgba(79,142,247,.08); border: 1px solid rgba(79,142,247,.2); color: #a8c4fa; }
+  .info-yellow { background: rgba(249,200,70,.08); border: 1px solid rgba(249,200,70,.2); color: #f9d97c; }
+  .info-green { background: rgba(56,232,160,.08); border: 1px solid rgba(56,232,160,.2); color: #7ef5c5; }
+
+  /* ─── CRONOGRAMA PAGE ──────────────────────── */
+  .timeline { position: relative; padding-left: 24px; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color .15s;
+  }
+
+  .tl-item:hover { border-color: rgba(79,142,247,.3); }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+  }
+
+  .tl-item.past::before { background: var(--muted); border-color: var(--muted); }
+  .tl-item.current::before { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px rgba(79,142,247,.2); }
+  .tl-item.upcoming::before { background: var(--surface2); border-color: var(--border); }
+
+  .tl-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+
+  .tl-num {
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--surface2);
+    color: var(--muted);
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  .tl-event { font-family: 'Syne', sans-serif; font-size: 13.5px; font-weight: 700; }
+  .tl-date { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+  .tl-status {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .status-past { background: rgba(107,116,146,.12); color: var(--muted); }
+  .status-current { background: rgba(79,142,247,.15); color: var(--accent); }
+  .status-open { background: rgba(56,232,160,.15); color: var(--green); }
+  .status-upcoming { background: rgba(249,200,70,.1); color: var(--yellow); }
+
+  /* ─── CHECKLIST PAGE ───────────────────────── */
+  .big-checklist { display: flex; flex-direction: column; gap: 6px; }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .check-item:hover { border-color: rgba(79,142,247,.3); }
+  .check-item.done { opacity: .55; }
+  .check-item.done .check-box { background: var(--green); border-color: var(--green); color: #000; }
+
+  .check-box {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    transition: all .15s;
+    margin-top: 1px;
+  }
+
+  .check-label { flex: 1; }
+  .check-label strong { font-size: 14px; display: block; margin-bottom: 2px; }
+  .check-label span { font-size: 12px; color: var(--muted); }
+
+  /* ─── MOBILE ───────────────────────────────── */
+  .hamburger {
+    display: none;
+    position: fixed;
+    top: 14px; left: 14px;
+    z-index: 200;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 40px; height: 40px;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    z-index: 90;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .hamburger { display: flex; }
+    .overlay.visible { display: block; }
+    .content { padding: 20px 16px; }
+    .topbar { padding: 14px 16px 14px 60px; }
+    .hero h2 { font-size: 22px; }
+  }
+
+  /* ─── ANIMATIONS ───────────────────────────── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page.active { animation: fadeIn .25s ease; }
+</style>
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="uni">UNIFAP · 2026</div>
+      <h1>Assistente em<br>Administração</h1>
+      <span class="badge">Código 108 · Nível D</span>
+    </div>
+
+    <div class="sidebar-section">Visão Geral</div>
+    <button class="nav-item active" onclick="navigate('overview', this)">
+      <span class="icon">🏠</span> Início
+    </button>
+    <button class="nav-item" onclick="navigate('cronograma', this)">
+      <span class="icon">📅</span> Cronograma
+    </button>
+    <button class="nav-item" onclick="navigate('checklist', this)">
+      <span class="icon">✅</span> Meu Progresso
+    </button>
+
+    <div class="sidebar-section">Matérias — Comuns</div>
+    <button class="nav-item" onclick="navigate('atualidades', this)">
+      <span class="icon">🌐</span> Atualidades <span class="count">5q</span>
+    </button>
+    <button class="nav-item" onclick="navigate('portugues', this)">
+      <span class="icon">📝</span> Língua Portuguesa <span class="count">5q</span>
+    </button>
+    <button class="nav-item" onclick="navigate('informatica', this)">
+      <span class="icon">💻</span> Noções de Informática <span class="count">5q</span>
+    </button>
+    <button class="nav-item" onclick="navigate('administrativo', this)">
+      <span class="icon">⚖️</span> Dir. Administrativo <span class="count">10q</span>
+    </button>
+    <button class="nav-item" onclick="navigate('constitucional', this)">
+      <span class="icon">🏛️</span> Dir. Constitucional <span class="count">10q</span>
+    </button>
+    <button class="nav-item" onclick="navigate('logica', this)">
+      <span class="icon">🧩</span> Raciocínio Lógico <span class="count">5q</span>
+    </button>
+
+    <div class="sidebar-section">Matéria Específica</div>
+    <button class="nav-item" onclick="navigate('especifico', this)">
+      <span class="icon">🗂️</span> Adm. Pública/Geral <span class="count">30q</span>
+    </button>
+
+    <div class="sidebar-footer">
+      <div class="progress-label">
+        <span>Progresso geral</span>
+        <span id="pct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Início</div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" onclick="navigate('checklist', document.querySelector('.nav-item:nth-child(5)'))">
+          ✅ Progresso
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══════════════════════ PAGE: OVERVIEW ═══════════════════════ -->
+      <div class="page active" id="page-overview">
+        <div class="hero">
+          <div class="hero-label">Concurso Público · UNIFAP 2026</div>
+          <h2>Guia de Estudos<br>Completo</h2>
+          <p>Todas as matérias do edital organizadas para você estudar com foco e eficiência. Marque tópicos conforme avança.</p>
+          <div class="hero-stats">
+            <div class="stat-pill">
+              <strong>70</strong>
+              <div><span>questões na prova</span></div>
+            </div>
+            <div class="stat-pill">
+              <strong>100</strong>
+              <div><span>pontos máximos</span></div>
+            </div>
+            <div class="stat-pill">
+              <strong>4h</strong>
+              <div><span>duração da prova</span></div>
+            </div>
+            <div class="stat-pill">
+              <strong>05/07</strong>
+              <div><span>data da prova</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box info-yellow">
+          <span class="info-box-icon">⚠️</span>
+          <div>Nota mínima de aprovação: <strong>50 pontos</strong> (50%), sem zerar em nenhuma área. Inscrições até <strong>12/06/2026</strong>.</div>
+        </div>
+
+        <h3 style="font-family:Syne;font-size:15px;font-weight:800;margin:24px 0 14px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:11px">
+          Clique numa matéria para estudar
+        </h3>
+
+        <div class="cards-grid">
+          <div class="card" onclick="navigate('atualidades', null)">
+            <div class="card-accent-bar" style="background:linear-gradient(90deg,#4f8ef7,#7c5cfc)"></div>
+            <div class="card-icon">🌐</div>
+            <h3>Atualidades</h3>
+            <p>Fatos políticos, econômicos, sociais e culturais a partir de 2020.</p>
+            <div class="card-meta">
+              <span class="tag tag-blue">5 questões · 5 pontos</span>
+            </div>
+          </div>
+
+          <div class="card" onclick="navigate('portugues', null)">
+            <div class="card-accent-bar" style="background:linear-gradient(90deg,#f75c7e,#f9844a)"></div>
+            <div class="card-icon">📝</div>
+            <h3>Língua Portuguesa</h3>
+            <p>Interpretação, ortografia, morfologia, sintaxe, pontuação e semântica.</p>
+            <div class="card-meta">
+              <span class="tag tag-red">5 questões · 5 pontos</span>
+            </div>
+          </div>
+
+          <div class="card" onclick="navigate('informatica', null)">
+            <div class="card-accent-bar" style="background:linear-gradient(90deg,#38e8a0,#4f8ef7)"></div>
+            <div class="card-icon">💻</div>
+            <h3>Noções de Informática</h3>
+            <p>Hardware, SO, Office, redes, segurança, nuvem e videoconferência.</p>
+            <div class="card-meta">
+              <span class="tag tag-green">5 questões · 5 pontos</span>
+            </div>
+          </div>
+
+          <div class="card" onclick="navigate('administrativo', null)">
+            <div class="card-accent-bar" style="background:linear-gradient(90deg,#f9c846,#f97c4f)"></div>
+            <div class="card-icon">⚖️</div>
+            <h3>Direito Administrativo</h3>
+            <p>Princípios, atos, poderes, licitações (Lei 14.133), controle e ética.</p>
+            <div class="card-meta">
+              <span class="tag tag-yellow">10 questões · 10 pontos</span>
+            </div>
+          </div>
+
+          <div class="card" onclick="navigate('constitucional', null)">
+            <div class="card-accent-bar" style="background:linear-gradient(90deg,#7c5cfc,#4f8ef7)"></div>
+            <div class="card-icon">🏛️</div>
+            <h3>Direito Constitucional</h3>
+            <p>CF/88: direitos fundamentais, organização do Estado e controle de constitucionalidade.</p>
+            <div class="card-meta">
+              <span class="tag tag-purple">10 questões · 10 pontos</span>
+            </div>
+          </div>
+
+          <div class="card" onclick="navigate('logica', null)">
+            <div class="card-accent-bar" style="background:linear-gradient(90deg,#38e8a0,#f9c846)"></div>
+            <div class="card-icon">🧩</div>
+            <h3>Raciocínio Lógico</h3>
+            <p>Proposições, tabelas-verdade, diagramas, sequências e problemas lógicos.</p>
+            <div class="card-meta">
+              <span class="tag tag-green">5 questões · 5 pontos</span>
+            </div>
+          </div>
+
+          <div class="card" onclick="navigate('especifico', null)" style="grid-column: span 1">
+            <div class="card-accent-bar" style="background:linear-gradient(90deg,#f75c7e,#7c5cfc,#4f8ef7)"></div>
+            <div class="card-icon">🗂️</div>
+            <h3>Conhecimentos Específicos</h3>
+            <p>Administração Pública, finanças, licitações, gestão de pessoas, atendimento e legislação.</p>
+            <div class="card-meta">
+              <span class="tag tag-red">30 questões · 60 pontos</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box info-green">
+          <span class="info-box-icon">💡</span>
+          <div>Os <strong>Conhecimentos Específicos</strong> valem 60% da prova (cada questão vale 2 pontos). Priorize essa área!</div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ PAGE: CRONOGRAMA ═══════════════════════ -->
+      <div class="page" id="page-cronograma">
+        <div class="subject-header">
+          <div class="subject-icon-big" style="background:rgba(79,142,247,.1)">📅</div>
+          <div>
+            <h2>Cronograma Oficial</h2>
+            <p>Datas do edital · UNIFAP 2026</p>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-item past">
+            <div class="tl-header">
+              <span class="tl-num">01</span>
+              <span class="tl-event">Publicação do Edital</span>
+              <span class="tl-status status-past">Concluído</span>
+            </div>
+            <div class="tl-date">📅 06/05/2026</div>
+          </div>
+          <div class="tl-item past">
+            <div class="tl-header">
+              <span class="tl-num">02</span>
+              <span class="tl-event">Período de Impugnação ao Edital</span>
+              <span class="tl-status status-past">Encerrado</span>
+            </div>
+            <div class="tl-date">📅 07/05 a 08/05/2026</div>
+          </div>
+          <div class="tl-item current">
+            <div class="tl-header">
+              <span class="tl-num">03</span>
+              <span class="tl-event">Período de Inscrição</span>
+              <span class="tl-status status-open">🟢 Aberto</span>
+            </div>
+            <div class="tl-date">📅 11/05/2026 a 12/06/2026</div>
+          </div>
+          <div class="tl-item current">
+            <div class="tl-header">
+              <span class="tl-num">04</span>
+              <span class="tl-event">Solicitação de Isenção da Taxa</span>
+              <span class="tl-status status-open">🟢 Aberto</span>
+            </div>
+            <div class="tl-date">📅 11/05 a 14/05/2026 · Taxa: R$ 100,00</div>
+          </div>
+          <div class="tl-item current">
+            <div class="tl-header">
+              <span class="tl-num">05</span>
+              <span class="tl-event">Solicitação de Atendimento Especial</span>
+              <span class="tl-status status-open">🟢 Aberto</span>
+            </div>
+            <div class="tl-date">📅 11/05 a 14/05/2026</div>
+          </div>
+          <div class="tl-item upcoming">
+            <div class="tl-header">
+              <span class="tl-num">06</span>
+              <span class="tl-event">Resultado Preliminar da Isenção</span>
+              <span class="tl-status status-upcoming">Em breve</span>
+            </div>
+            <div class="tl-date">📅 18/05/2026</div>
+          </div>
+          <div class="tl-item upcoming">
+            <div class="tl-header">
+              <span class="tl-num">09</span>
+              <span class="tl-event">Pagamento da Taxa de Inscrição</span>
+              <span class="tl-status status-upcoming">Em breve</span>
+            </div>
+            <div class="tl-date">📅 até 13/06/2026 · Banco do Brasil (GRU)</div>
+          </div>
+          <div class="tl-item upcoming">
+            <div class="tl-header">
+              <span class="tl-num">12</span>
+              <span class="tl-event">Homologação das Inscrições</span>
+              <span class="tl-status status-upcoming">Em breve</span>
+            </div>
+            <div class="tl-date">📅 23/06/2026</div>
+          </div>
+          <div class="tl-item upcoming">
+            <div class="tl-header">
+              <span class="tl-num">13</span>
+              <span class="tl-event">Divulgação dos Locais de Prova</span>
+              <span class="tl-status status-upcoming">Em breve</span>
+            </div>
+            <div class="tl-date">📅 29/06/2026</div>
+          </div>
+          <div class="tl-item upcoming" style="border-color:rgba(79,142,247,.4)">
+            <div class="tl-header">
+              <span class="tl-num">14</span>
+              <span class="tl-event">🎯 PROVA OBJETIVA</span>
+              <span class="tl-status status-current">Principal</span>
+            </div>
+            <div class="tl-date">📅 05/07/2026 (domingo) · 4 horas · Macapá/AP</div>
+          </div>
+          <div class="tl-item upcoming">
+            <div class="tl-header">
+              <span class="tl-num">15</span>
+              <span class="tl-event">Gabarito Preliminar</span>
+              <span class="tl-status status-upcoming">Em breve</span>
+            </div>
+            <div class="tl-date">📅 06/07/2026</div>
+          </div>
+          <div class="tl-item upcoming">
+            <div class="tl-header">
+              <span class="tl-num">29</span>
+              <span class="tl-event">Homologação do Resultado Final</span>
+              <span class="tl-status status-upcoming">Em breve</span>
+            </div>
+            <div class="tl-date">📅 25/08/2026</div>
+          </div>
+        </div>
+
+        <div class="info-box info-blue" style="margin-top:24px">
+          <span class="info-box-icon">🔗</span>
+          <div>Acompanhe todas as publicações em: <strong>https://depsec.unifap.br/concursos</strong></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ PAGE: CHECKLIST ═══════════════════════ -->
+      <div class="page" id="page-checklist">
+        <div class="subject-header">
+          <div class="subject-icon-big" style="background:rgba(56,232,160,.1)">✅</div>
+          <div>
+            <h2>Meu Progresso</h2>
+            <p>Marque as tarefas conforme você avança na preparação</p>
+          </div>
+        </div>
+
+        <div class="big-checklist" id="checklist">
+          <!-- Inscrição -->
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c1">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>📋 Realizar inscrição no site da UNIFAP</strong>
+              <span>https://depsec.unifap.br/concursos — até 12/06/2026</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c2">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>💰 Pagar taxa de inscrição (R$ 100,00)</strong>
+              <span>GRU — Banco do Brasil — até 13/06/2026</span>
+            </div>
+          </div>
+          <!-- Estudos -->
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c3">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>🌐 Estudar Atualidades</strong>
+              <span>Fatos nacionais e internacionais a partir de 2020</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c4">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>📝 Estudar Língua Portuguesa</strong>
+              <span>Interpretação, ortografia, morfologia, sintaxe, semântica</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c5">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>💻 Estudar Noções de Informática</strong>
+              <span>Hardware, Office, redes, segurança, LGPD</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c6">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>⚖️ Estudar Direito Administrativo</strong>
+              <span>Princípios, atos, licitações (Lei 14.133/2021), controle</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c7">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>🏛️ Estudar Direito Constitucional</strong>
+              <span>CF/88, direitos fundamentais, organização do Estado</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c8">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>🧩 Estudar Raciocínio Lógico</strong>
+              <span>Proposições, tabelas-verdade, diagramas, sequências</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c9">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>🗂️ Estudar Conhecimentos Específicos — Parte 1</strong>
+              <span>Funções administrativas, comportamento organizacional, processos estratégicos</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c10">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>🗂️ Estudar Conhecimentos Específicos — Parte 2</strong>
+              <span>Orçamento público, Administração Pública, licitações (Lei 14.133)</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c11">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>🗂️ Estudar Conhecimentos Específicos — Parte 3</strong>
+              <span>Atendimento, Lei 9.784, PNDP, Governo Digital, Gestão de Pessoas</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c12">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>📄 Fazer simulados / questões antigas</strong>
+              <span>Praticar questões de concursos anteriores do cargo</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c13">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>📍 Verificar local de prova</strong>
+              <span>Disponível em 29/06/2026 no site da UNIFAP</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c14">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>🖊️ Separar caneta esferográfica transparente (azul ou preta)</strong>
+              <span>Exigida no edital — sem caneta apagável</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c15">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>🪪 Separar documento original com foto</strong>
+              <span>RG, CNH, CTPS ou equivalente válido</span>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-id="c16">
+            <div class="check-box">✓</div>
+            <div class="check-label">
+              <strong>🖨️ Imprimir Cartão de Informação do Candidato</strong>
+              <span>Disponível no site — necessário no dia da prova</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ PAGE: ATUALIDADES ═══════════════════════ -->
+      <div class="page" id="page-atualidades">
+        <div class="subject-header">
+          <div class="subject-icon-big" style="background:rgba(79,142,247,.1)">🌐</div>
+          <div>
+            <h2>Atualidades</h2>
+            <p>5 questões · 5 pontos (1 ponto/questão)</p>
+          </div>
+        </div>
+        <div class="info-box info-blue">
+          <span class="info-box-icon">📌</span>
+          <div>Fatos políticos, econômicos, sociais e culturais nacionais e internacionais ocorridos <strong>a partir de 2020</strong>, divulgados na mídia local e/ou nacional.</div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left">
+                <span class="accordion-num">1</span>
+                Política Nacional e Internacional
+              </span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Eleições, reformas e mudanças de governo no Brasil (2022–2026)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Relações diplomáticas do Brasil com outros países</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Conflitos internacionais em destaque (Ucrânia/Rússia, Oriente Médio)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Acordos e blocos internacionais (MERCOSUL, BRICS, G20)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left">
+                <span class="accordion-num">2</span>
+                Economia e Desenvolvimento
+              </span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Inflação, PIB, desemprego e indicadores econômicos recentes</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Reforma tributária e fiscal brasileira</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Programas sociais (Bolsa Família, PAC, etc.)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Economia verde e sustentabilidade</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left">
+                <span class="accordion-num">3</span>
+                Saúde, Tecnologia e Meio Ambiente
+              </span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Pós-pandemia de COVID-19: impactos e legados</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Inteligência Artificial: avanços e debates (ChatGPT, regulação)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Mudanças climáticas: COP, Amazônia e políticas ambientais</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Saúde pública e SUS: desafios e melhorias recentes</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left">
+                <span class="accordion-num">4</span>
+                Amapá e Região Norte
+              </span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Política e gestão do estado do Amapá</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Desenvolvimento econômico e infraestrutura regional</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Questões ambientais e indígenas na região</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>UNIFAP e educação superior no Amapá</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="info-box info-yellow" style="margin-top:20px">
+          <span class="info-box-icon">💡</span>
+          <div>Dica: leia jornais como G1, UOL, Agência Brasil e veículos locais do Amapá diariamente. Foque nos últimos 6 meses antes da prova.</div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ PAGE: PORTUGUÊS ═══════════════════════ -->
+      <div class="page" id="page-portugues">
+        <div class="subject-header">
+          <div class="subject-icon-big" style="background:rgba(247,92,126,.1)">📝</div>
+          <div>
+            <h2>Língua Portuguesa</h2>
+            <p>5 questões · 5 pontos (1 ponto/questão)</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">1</span>Leitura e Interpretação de Textos</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Variedades de linguagem e tipos/gêneros textuais</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Coerência, progressão temática e relações contextuais</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Informações explícitas e implícitas; inferências válidas</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Pressupostos e subentendidos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Identificação do sentido global e estrutura argumentativa</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">2</span>Elementos de Estruturação do Texto</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Recursos de coesão textual</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Pronomes e funções referenciais</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Nexos e conectores</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Organização de parágrafos e progressão temática</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">3</span>Ortografia</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Sistema ortográfico oficial vigente; emprego de letras</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Acentuação gráfica; uso do hífen</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Divisão silábica</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Relações entre fonema e grafema</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">4</span>Morfologia</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Estrutura e formação de palavras; derivação e composição</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Classes de palavras e características morfológicas</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Flexão nominal e verbal — formas regulares e irregulares</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Tempos, modos e vozes verbais; valores semânticos</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">5</span>Sintaxe</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>A oração e seus termos; ordem dos elementos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Regência nominal e verbal, inclusive o uso da crase</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Concordância nominal e verbal</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Período simples e composto: coordenação e subordinação</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Discurso direto, indireto e indireto livre</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">6</span>Pontuação e Semântica</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Emprego dos sinais de pontuação e efeitos de sentido</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Sinonímia, antonímia, hiponímia, homonímia e polissemia</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Valores contextuais, denotativos e conotativos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Relações lógicas e enunciativas entre frases</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ PAGE: INFORMÁTICA ═══════════════════════ -->
+      <div class="page" id="page-informatica">
+        <div class="subject-header">
+          <div class="subject-icon-big" style="background:rgba(56,232,160,.1)">💻</div>
+          <div>
+            <h2>Noções de Informática</h2>
+            <p>5 questões · 5 pontos (1 ponto/questão)</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">1</span>Conceitos Fundamentais e Hardware</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Hardware, software e periféricos; componentes básicos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Dispositivos de entrada, saída e armazenamento</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Unidades de medida e processamento de dados</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Sistemas operacionais: Windows e Linux Ubuntu</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Gerenciamento de arquivos e pastas</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">2</span>Pacote Office e LibreOffice</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Word / Writer: formatação de documentos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Excel / Calc: planilhas, gráficos, fórmulas, filtros</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>PowerPoint / Impress: apresentações</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Outlook: gerenciamento de e-mail</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">3</span>Redes, Internet e E-mail</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Tipos de rede, topologias, protocolos, endereçamento IP</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Navegação na web: Chrome, Edge, Firefox</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Correio eletrônico: estrutura, envio, recebimento e anexos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Uso ético e seguro do e-mail institucional</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">4</span>Segurança da Informação e LGPD</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Vírus, malwares, phishing, engenharia social</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Criptografia, autenticação, senhas seguras e backups</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>LGPD (Lei nº 13.709/2018): uso de sistemas e dados institucionais</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Ética no uso de TIC no ambiente de trabalho</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">5</span>Computação em Nuvem e Colaboração</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Cloud computing: conceitos, vantagens e riscos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Google Drive, OneDrive, Dropbox</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Videoconferência: Teams, Zoom, Google Meet, Moodle</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Redes sociais institucionais e comunicação digital</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ PAGE: DIR. ADMINISTRATIVO ═══════════════════════ -->
+      <div class="page" id="page-administrativo">
+        <div class="subject-header">
+          <div class="subject-icon-big" style="background:rgba(249,200,70,.1)">⚖️</div>
+          <div>
+            <h2>Direito Administrativo</h2>
+            <p>10 questões · 10 pontos (1 ponto/questão)</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">1</span>Noções Gerais e Princípios</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Conceito, fontes e objeto do Direito Administrativo</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Regime jurídico-administrativo: LIMPE (Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Razoabilidade, proporcionalidade, continuidade do serviço público</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Supremacia e indisponibilidade do interesse público</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">2</span>Estrutura da Administração Pública</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Administração direta e indireta</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Autarquias, fundações públicas, empresas públicas e sociedades de economia mista</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Descentralização, desconcentração e delegação de competência</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">3</span>Atos Administrativos</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Conceito, elementos (competência, finalidade, forma, motivo, objeto)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Atributos: presunção de legitimidade, imperatividade, autoexecutoriedade</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Classificação, espécies, nulidade e revogação</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Motivação e publicidade dos atos</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">4</span>Poderes da Administração</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Poder vinculado e discricionário</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Poder hierárquico e disciplinar</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Poder regulamentar e de polícia</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Abuso e desvio de poder</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">5</span>Licitações — Lei 14.133/2021</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Princípios e modalidades (Pregão, Concorrência, Concurso, Leilão, Diálogo Competitivo)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Fases do processo licitatório</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Contratos administrativos: cláusulas, execução, fiscalização</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Sanções e penalidades; extinção contratual</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">6</span>Responsabilidade, Controle e Ética</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Responsabilidade civil do Estado: teoria objetiva</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Controle interno, externo e social; TCU e CGU</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Improbidade administrativa (Lei 8.429/92 com alterações da Lei 14.230/2021)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Código de Ética do Servidor Público Federal (Decreto 1.171/1994)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Processo administrativo federal (Lei 9.784/1999)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ PAGE: DIR. CONSTITUCIONAL ═══════════════════════ -->
+      <div class="page" id="page-constitucional">
+        <div class="subject-header">
+          <div class="subject-icon-big" style="background:rgba(124,92,252,.1)">🏛️</div>
+          <div>
+            <h2>Direito Constitucional</h2>
+            <p>10 questões · 10 pontos (1 ponto/questão)</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">1</span>Conceitos Fundamentais e Princípios</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Conceito, natureza e finalidade da Constituição</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Classificação das constituições</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Princípios fundamentais da República (arts. 1º a 4º CF/88)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Soberania, cidadania, dignidade, valores sociais, pluralismo político</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">2</span>Direitos e Garantias Fundamentais</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Direitos e deveres individuais e coletivos (art. 5º)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Direitos sociais (arts. 6º a 11)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Habeas corpus, mandado de segurança, mandado de injunção, habeas data, ação popular</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Aplicabilidade e limitações dos direitos fundamentais</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">3</span>Organização do Estado</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>União, Estados, DF e Municípios: autonomia e competências</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Princípios constitucionais da Administração Pública (art. 37)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Regime jurídico dos servidores públicos civis</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Responsabilidade civil do Estado; controle interno e externo</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">4</span>Organização dos Poderes</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Legislativo, Executivo e Judiciário: estrutura, competências e funções</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Processo legislativo</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Atribuições do Presidente da República</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>MP, Advocacia Pública e Defensoria Pública</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">5</span>Educação, Controle e Autonomia Universitária</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Princípios constitucionais da educação (Título VIII)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Autonomia universitária (art. 207 CF/88)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Controle de constitucionalidade: ADI, ADC, ADPF, súmula vinculante</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Principais emendas constitucionais com impacto na Administração Pública</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ PAGE: RACIOCÍNIO LÓGICO ═══════════════════════ -->
+      <div class="page" id="page-logica">
+        <div class="subject-header">
+          <div class="subject-icon-big" style="background:rgba(56,232,160,.1)">🧩</div>
+          <div>
+            <h2>Raciocínio Lógico</h2>
+            <p>5 questões · 5 pontos (1 ponto/questão)</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">1</span>Lógica Proposicional</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Proposições simples e compostas</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Conectivos lógicos: negação, conjunção, disjunção, condicional, bicondicional</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Tabelas-verdade</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Equivalências e negações de proposições</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Quantificadores e implicações</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">2</span>Argumentação e Inferências</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Validade de argumentos e inferências</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Raciocínio dedutivo e indutivo</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Diagramas lógicos (silogismos)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">3</span>Sequências e Padrões</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Sequências numéricas: identificar padrões e regularidades</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Sequências figurativas</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Resolução de problemas lógicos, matemáticos e combinatórios</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">4</span>Aplicação em Contextos Administrativos</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Raciocínio lógico aplicado a contextos administrativos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Interpretação de dados quantitativos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Problemas de proporção, porcentagem e lógica situacional</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ PAGE: ESPECÍFICO ═══════════════════════ -->
+      <div class="page" id="page-especifico">
+        <div class="subject-header">
+          <div class="subject-icon-big" style="background:rgba(247,92,126,.1)">🗂️</div>
+          <div>
+            <h2>Conhecimentos Específicos</h2>
+            <p>30 questões · 60 pontos (2 pontos/questão) — ⭐ Área mais importante!</p>
+          </div>
+        </div>
+
+        <div class="info-box info-yellow">
+          <span class="info-box-icon">⭐</span>
+          <div>Esta área vale <strong>60% da prova</strong>. Cada questão vale 2 pontos. Priorize o máximo de tempo aqui!</div>
+        </div>
+
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">1</span>Funções Administrativas</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Planejamento: estratégico, tático e operacional; aplicações no setor público</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Organização e ferramentas modernas de gestão administrativa</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Direção e liderança; controle e avaliação de resultados</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Fundamentos teóricos da administração: eficiência, eficácia e efetividade</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Técnicas de tratamento, gestão e arquivamento de documentos</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">2</span>Comportamento Organizacional</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Teorias da motivação (Maslow, Herzberg, McGregor)</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Modelos de liderança</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Comunicação institucional</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Gestão de conflitos; trabalho em equipe</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Clima e cultura organizacional</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">3</span>Processos Estratégicos</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Ferramentas analíticas: árvores de decisão, análise SWOT</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Métodos quantitativos aplicados à gestão</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Etapas do processo decisório na Administração Pública</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Indicadores de desempenho institucional</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">4</span>Finanças e Orçamento Público</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Princípios orçamentários</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>PPA, LDO e LOA: conceitos e funções</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Receitas e despesas públicas; gestão financeira e patrimonial</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Contabilidade pública, análise de custos e controle de gastos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Auditoria, controle interno e externo; atribuições dos Tribunais de Contas</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">5</span>Administração Pública</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Modelos: administração direta e indireta</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Administração burocrática, gerencial e contemporânea</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Governança, gestão por resultados e inovação pública</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Gestão do conhecimento e transformação digital</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Políticas públicas e seu ciclo</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Modernização e inovação administrativa</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">6</span>Lei 14.133/2021 — Nova Lei de Licitações</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Princípios, fases e procedimentos do processo licitatório</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Modalidades de licitação e critérios de julgamento</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Contratos administrativos: gestão, fiscalização, aditivos e penalidades</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Responsabilidades do gestor e do fiscal de contratos</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Regras de arquivamento e preservação documental no setor público</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">7</span>Gestão de Pessoas no Setor Público</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Provimento, desenvolvimento, capacitação e avaliação de desempenho</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Carreiras no serviço público</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Treinamento e desenvolvimento; clima organizacional</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Decreto Federal nº 9.991/2019 — PNDP (Política Nacional de Desenvolvimento de Pessoas)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-trigger" onclick="toggleAccordion(this)">
+              <span class="at-left"><span class="accordion-num">8</span>Atendimento ao Público e Legislação</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <ul class="topic-list">
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Comunicação, ética, sigilo administrativo e qualidade no atendimento</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Lei Federal nº 9.784/1999 — processo administrativo federal: princípios, prazos, fases</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Lei Federal nº 14.129/2021 — Governo Digital, transformação digital, transparência</li>
+                <li onclick="toggleTopic(this)"><span class="topic-check"></span>Direitos e deveres do administrado e da Administração</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box info-green" style="margin-top:20px">
+          <span class="info-box-icon">📚</span>
+          <div>Leis chave para memorizar: <strong>Lei 14.133/2021</strong> (licitações), <strong>Lei 9.784/1999</strong> (processo adm.), <strong>Decreto 9.991/2019</strong> (PNDP), <strong>Lei 14.129/2021</strong> (Governo Digital).</div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+// ─── NAVIGATION ────────────────────────────
+function navigate(id, btn) {
+  // hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // show target
+  document.getElementById('page-' + id).classList.add('active');
+
+  // update nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    // find by page id
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) {
+        n.classList.add('active');
+      }
+    });
+  }
+
+  // topbar title
+  const titles = {
+    overview: 'Início',
+    cronograma: 'Cronograma',
+    checklist: 'Meu Progresso',
+    atualidades: 'Atualidades',
+    portugues: 'Língua Portuguesa',
+    informatica: 'Noções de Informática',
+    administrativo: 'Direito Administrativo',
+    constitucional: 'Direito Constitucional',
+    logica: 'Raciocínio Lógico',
+    especifico: 'Conhecimentos Específicos'
+  };
+  document.getElementById('topbarTitle').textContent = titles[id] || id;
+
+  // close mobile sidebar
+  closeSidebar();
+  window.scrollTo(0, 0);
+}
+
+// ─── ACCORDION ─────────────────────────────
+function toggleAccordion(trigger) {
+  const item = trigger.closest('.accordion-item');
+  item.classList.toggle('open');
+}
+
+// ─── TOPIC CHECKBOXES ──────────────────────
+function toggleTopic(li) {
+  li.classList.toggle('done');
+  if (li.classList.contains('done')) {
+    li.querySelector('.topic-check').textContent = '✓';
+  } else {
+    li.querySelector('.topic-check').textContent = '';
+  }
+  saveTopics();
+  updateProgress();
+}
+
+function saveTopics() {
+  const items = document.querySelectorAll('.topic-list li');
+  const state = {};
+  items.forEach((li, i) => {
+    state['topic_' + i] = li.classList.contains('done');
+  });
+  try { localStorage.setItem('unifap_topics', JSON.stringify(state)); } catch(e){}
+}
+
+function loadTopics() {
+  try {
+    const state = JSON.parse(localStorage.getItem('unifap_topics') || '{}');
+    const items = document.querySelectorAll('.topic-list li');
+    items.forEach((li, i) => {
+      if (state['topic_' + i]) {
+        li.classList.add('done');
+        li.querySelector('.topic-check').textContent = '✓';
+      }
+    });
+  } catch(e){}
+}
+
+function updateProgress() {
+  const all = document.querySelectorAll('.topic-list li').length;
+  const done = document.querySelectorAll('.topic-list li.done').length;
+  const checkDone = document.querySelectorAll('.check-item.done').length;
+  const checkAll = document.querySelectorAll('.check-item').length;
+  const total = all + checkAll;
+  const totalDone = done + checkDone;
+  const pct = total > 0 ? Math.round((totalDone / total) * 100) : 0;
+  document.getElementById('pct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ─── CHECKLIST ─────────────────────────────
+function toggleCheck(item) {
+  item.classList.toggle('done');
+  const box = item.querySelector('.check-box');
+  box.textContent = item.classList.contains('done') ? '✓' : '✓';
+  saveChecklist();
+  updateProgress();
+}
+
+function saveChecklist() {
+  const items = document.querySelectorAll('.check-item');
+  const state = {};
+  items.forEach(item => {
+    state[item.dataset.id] = item.classList.contains('done');
+  });
+  try { localStorage.setItem('unifap_checks', JSON.stringify(state)); } catch(e){}
+}
+
+function loadChecklist() {
+  try {
+    const state = JSON.parse(localStorage.getItem('unifap_checks') || '{}');
+    document.querySelectorAll('.check-item').forEach(item => {
+      if (state[item.dataset.id]) {
+        item.classList.add('done');
+      }
+    });
+  } catch(e){}
+}
+
+// ─── SIDEBAR MOBILE ─────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('visible');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('visible');
+}
+
+// ─── INIT ───────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  loadTopics();
+  loadChecklist();
+  updateProgress();
+});
+</script>
+</body>
+</html>
